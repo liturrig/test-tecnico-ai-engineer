@@ -79,7 +79,7 @@ All'interno troverai i seguenti file e cartelle:
 
 Per supportare lo sviluppo e la verifica del tuo sistema, nella cartella [dataset/ground_truth](./Dataset/ground_truth) troverai i file necessari per l'evaluation.
 
-**Attenzione**: la ground truth non deve essere utilizzata dal sistema GenAI per generare le risposte, ma serve esclusivamente per valutare le performance. Il dataset è suddiviso in *public* e *private* (vedi colonna "Usage" in `ground_truth_mapped.csv`) nel caso tu voglia suddividere test e validation.
+**Attenzione**: la ground truth non deve essere utilizzata dal sistema GenAI per generare le risposte, ma serve esclusivamente per valutare le performance. Il dataset è suddiviso in *public* e *private* (vedi colonna "Usage" in [`ground_truth_mapped.csv`](./Dataset/ground_truth/ground_truth_mapped.csv)) nel caso tu voglia suddividere test e validation.
 
 L'evaluation misura la correttezza delle risposte confrontando i piatti restituiti dal tuo sistema con quelli attesi.
 La metrica utilizzata è la **Jaccard Similarity**, calcolata per ogni domanda come l'intersezione diviso l'unione degli ID dei piatti.
@@ -106,7 +106,7 @@ row_id,result
 ```
 
 **Dettagli dei campi:**
-- `row_id`: l'ID progressivo della domanda (corrispondente alla riga nel file [domande.csv](./Dataset/domande.csv)).
+- `row_id`: l'ID progressivo della domanda (corrispondente alla riga nel file [domande.csv](./Dataset/domande.csv)), incrementale a partire da 1.
 - `result`: una stringa contenente gli ID dei piatti identificati, separati da virgola.
     - **Nota**: Il campo non può essere vuoto. Si assume che esista sempre almeno un piatto che soddisfi la query.
     - **Mapping**: Per ottenere gli ID corretti, associa i nomi dei piatti trovati agli ID corrispondenti utilizzando il file [dish_mapping.json](./Dataset/ground_truth/dish_mapping.json).
