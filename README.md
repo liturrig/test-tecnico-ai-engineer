@@ -44,7 +44,7 @@ All'interno troverai i seguenti file e cartelle:
     - L’elenco e la descrizione delle tecniche culinarie di preparazione esistenti
     - \[Hint\] La maggior parte del documento descrive nel dettaglio le tecniche disponibili. Ci sono circa 10 macrocategorie di tecniche culinarie dove ciascuna di esse comprende circa 5 tecniche. Alcuni utenti potrebbero richiedere piatti con una specifica macrocategoria di tecnica o una specifica tecnica.
     - \[Hint\] La maggior parte del testo è flavuor e non serve per rispondere alle domande.
-    - \[Hint\] Gli ordini professionali sono perlopiù usati da alcuni utenti che esprimono una preferenza verso una specifica tecnica. Questa tecnica in genere è riportata nei menu attraverso l'uso di  emoji + glossario.
+    - \[Hint\] Gli ordini professionali sono perlopiù usati da alcuni utenti che esprimono una preferenza verso una specifica tecnica. Questa tecnica in genere è riportata nei menu attraverso l'uso di emoji + glossario.
 
 - `Menu (30 ristoranti)`
     
