@@ -1,4 +1,6 @@
-### Descrizione della sfida 🪐
+## Descrizione della sfida 🪐
+
+_(Disclaimer: questa sezione iniziale è puramente flavuor ed era stata usata per la sfida "Hackapizza". Leggere la sezione successiva per avere tutto il necessario per completare il test tecnico)_
 
 **Benvenuti** nel **Ciclo Cosmico 789**, dove l'umanità ha superato non solo i confini del proprio sistema solare, ma anche quelli delle dimensioni conosciute. In questo vasto intreccio di realtà e culture, la gastronomia si è evoluta in un'arte che trascende spazio e tempo. 
 
@@ -14,22 +16,24 @@ Nel cuore pulsante di questo arcipelago cosmico di sapori, si erge un elemento d
 
 ![](https://www.googleapis.com/download/storage/v1/b/kaggle-user-content/o/inbox%2F6840884%2F0c07b3e6f34ac48b9bb627387ce71531%2FTesto%20del%20paragrafo%20(1).png?generation=1737047186767633&alt=media)
 
-### Descrizione Dataset 📋
+***Che la forza sia con voi.***
 
-Avrete accesso a un ricco set di documenti appartenenti a questo ecosistema gastronomico galattico:
+## Test Tecnico 
 
-- `planets_distance_matrix.csv`
-    
-    Un csv che contiene la matrice delle distanze in anni luce tra i pianeti su cui si trovano i diversi ristoranti
-    
-- `Codice Galattico.pdf`
-    
-    Un documento legislativo contenente:
-    
-    - Limiti quantitativi applicati all’utilizzo di alcuni ingredienti nella preparazione dei piatti
-    - \[Hint\] Alcuni utenti potrebbero chiedere che il loro piatto rispetti tali limiti, pertanto è necessario controllare la presenza di tali ingredienti e fare una crossref sulla quantità
-    - Vincoli relativi alle certificazioni che gli chef hanno bisogno di acquisire per poter utilizzare specifiche tecniche di preparazione dei piatti
-    - \[Hint\] Alcuni utenti potrebbero chiedere che lo chef che prepara il piatto abbia le certificazioni a norma per cucinare tale piatto, pertanto è necessario controllare per ogni tecnica se lo chef ha la certificazione al livello corretto
+### Specifiche tecniche 💻
+
+Ti sarà richiesto di creare una repository Github che contenga il codice per risolvere in maniera parziale o totale la sfida di Hackapizza.
+
+Il sistema GenAI che creerai dovrà essere in grado di rispondere alle domande presenti in questo [csv](./dataset/domande.csv). Le domande sono ordinate per difficoltà e per tipologia.
+
+Le domande sono in linguaggio naturale ma hanno come risposta univoca una lista di piatti. Ad esempio, la prima domanda "Quali sono i piatti che includono le Chocobo Wings come ingrediente?", ha come risposta \["Galassia di Sapori: Il Viaggio Senza Tempo"\], mentre la domanda 10 "Quali piatti eterei sono preparati usando sia la Cottura Olografica Quantum Fluttuante che la Decostruzione Interdimensionale Lovecraftiana?" ha come risposta i piatti \["Risotto dei Multiversi", "La Mucca Che Stordisce l'Universo", "Sogni di Abisso Cosmico"\]
+
+
+### Descrizione Knowledge Base 📋
+
+Dentro la cartella [knowledge_base](./dataset/knowledge_base), ci sono tutti i file necessari per l'applicativo GenAI per rispondere alle domande.   
+
+All'interno troverai i seguenti file e cartelle:
 
 - `Manuale di Cucina.pdf`
     
@@ -38,8 +42,9 @@ Avrete accesso a un ricco set di documenti appartenenti a questo ecosistema gast
     - L’elenco e la descrizione delle certificazione che uno chef può acquisire
     - L’elenco degli ordini professionali gastronomici a cui uno chef può aderire
     - L’elenco e la descrizione delle tecniche culinarie di preparazione esistenti
-    - [Hint] La maggior parte del documento descrive nel dettaglio le tecniche disponibili. Ci sono circa 10 macrocategorie di tecniche culinarie dove ciascuna di esse comprende circa 5 tecniche. Alcuni utenti potrebbero richiedere piatti con una specifica macrocategoria di tecnica o una specifica tecnica.
-    - [Hint] Gli ordini professionali sono perlopiù usati da alcuni utenti che esprimono una preferenza verso una specifica tecnica. Questa tecnica in genere è riportata nei menu attraverso l'uso di  emoji + glossario.
+    - \[Hint\] La maggior parte del documento descrive nel dettaglio le tecniche disponibili. Ci sono circa 10 macrocategorie di tecniche culinarie dove ciascuna di esse comprende circa 5 tecniche. Alcuni utenti potrebbero richiedere piatti con una specifica macrocategoria di tecnica o una specifica tecnica.
+    - \[Hint\] La maggior parte del testo è flavuor e non serve per rispondere alle domande.
+    - \[Hint\] Gli ordini professionali sono perlopiù usati da alcuni utenti che esprimono una preferenza verso una specifica tecnica. Questa tecnica in genere è riportata nei menu attraverso l'uso di  emoji + glossario.
 
 - `Menu (30 ristoranti)`
     
@@ -49,31 +54,31 @@ Avrete accesso a un ricco set di documenti appartenenti a questo ecosistema gast
     - Ogni piatto contiene gli ingredienti usati e le tecniche di preparazione
     - Alcuni menu possiedono anche una descrizione in linguaggio naturale della preparazione
     - Laddove via siano certi ordini professionali, i menu lo citano
+
+- `planets_distance_matrix.csv`
+    Un csv che contiene la matrice delle distanze in anni luce tra i pianeti su cui si trovano i diversi ristoranti.    
+    \[Hint\] Alcune domande fanno riferimento a volere dei piatti all'interno di una certa distanza. Ogni ristorante (eccetto uno) si trova su un pianeta.
+
+- `Codice Galattico.pdf`
     
+    Un documento legislativo contenente:
+    
+    - Limiti quantitativi applicati all’utilizzo di alcuni ingredienti nella preparazione dei piatti
+    - \[Hint\] Alcuni utenti potrebbero chiedere che il loro piatto rispetti tali limiti, pertanto è necessario controllare la presenza di tali ingredienti e fare una crossref sulla quantità
+    - Vincoli relativi alle certificazioni che gli chef hanno bisogno di acquisire per poter utilizzare specifiche tecniche di preparazione dei piatti
+    - \[Hint\] Alcuni utenti potrebbero chiedere che lo chef che prepara il piatto abbia le certificazioni a norma per cucinare tale piatto, pertanto è necessario controllare per ogni tecnica se lo chef ha la certificazione al livello corretto
+    - \[Hint\] Questo documento, le informazioni da estrarre e da rielaborare, sono le più difficili del test tecnico e hanno impatto solo sulle ultime 4 domande del [csv](./dataset/domande.csv).
+
 - `Blog post`
-    
+
     - Pagine HTML che contengono informazioni supplementari su alcuni ristoranti
-    - \[Hint\] Sono necessari solo per un numero limitatissimo di domande
+    - \[Hint\] Sono necessari solo per un numero limitatissimo di domande, da usare congiuntamente con il Codice Galattico.pdf
 
-- `domande.csv`
-    - File contenente la lista di esempi di domande che possono essere fatte al sistema
 
-### Specifiche tecniche 💻
+### Evaluation
+Per aiutarvi nel test tecnico, dentro la cartella [dataset](./dataset/ground_truth) troverai il necessario per fare l'evaluation. Tuttavia la ground truth (almeno di considerazioni particolari) non va usata all'interno del sistema GenAI. Il dataset è già diviso in public / private nel caso vogliate fare validation/test dataset.
 
-La vostra missione è proporre una soluzione per un assistente AI che aiuti i viaggiatori intergalattici a navigare in questo ricco panorama culinario.
-
-Il sistema dovrà essere in grado di suggerire agli utenti piatti appropriati sulla base delle loro richieste:
-
-- Interpretando domande in linguaggio naturale
-- Gestendo query complesse che coinvolgono preferenze e restrizioni alimentari
-- Elaborando informazioni provenienti da diverse fonti (menu, blog post, leggi galattiche e manuali di cucina)
-- (Laddove richiesto esplicitamente) Verificando la conformità dei piatti con le normative vigenti
-
-Inoltre, il vostro sistema dovrà:
-
-- Utilizzare tecniche di **Generative AI** (**RAG**, **Agenti AI**) per processare e comprendere i documenti forniti
-- Essere in grado di:
-    - Ricevere in input una richiesta utente relativa a possibili piatti che corrispondono a criteri espressi in linguaggio naturale
-    - Fornire in output una lista di piatti che rispettano tali criteri sulla base della documentazione fornita
-
-***Che la forza sia con voi.***
+Per lanciare l'evaluation delle tua soluzione, vi consigliamo di usare il seguente comando:
+```python
+python src/evaluation.py --submission path/to/your_submission.csv
+```
