@@ -1,6 +1,6 @@
 ## Descrizione della sfida 🪐
 
-_(Disclaimer: questa sezione iniziale è puramente flavuor ed era stata usata per la sfida "Hackapizza". Leggere la sezione successiva per avere tutto il necessario per completare il test tecnico)_
+_(Disclaimer: questa sezione iniziale è puramente flavour ed era stata usata per la sfida "Hackapizza". Leggere la sezione successiva per avere tutto il necessario per completare il test tecnico)_
 
 **Benvenuti** nel **Ciclo Cosmico 789**, dove l'umanità ha superato non solo i confini del proprio sistema solare, ma anche quelli delle dimensioni conosciute. In questo vasto intreccio di realtà e culture, la gastronomia si è evoluta in un'arte che trascende spazio e tempo. 
 
@@ -27,9 +27,9 @@ Ti sarà richiesto di creare una repository Github che contenga il codice per ri
 Il sistema GenAI che creerai dovrà essere in grado di rispondere alle domande presenti in questo [csv](./Dataset/domande.csv). Le domande sono ordinate per difficoltà e per tipologia.
 
 Per la precisione:
-- le domande di difficoltà "Easy" riguardano solo gli Ingredienti e le Tecniche, pertando bastano solo i [Menu](./Dataset/knowledge_base/menu/) di ciascun ristorante
-- le domande di difficoltà "Medium" riguardano anche le Licenze e i Pianeti. Nei [Menu](./Dataset/knowledge_base/menu/) sono descritte il livello di Licenza di ogni Chef e il Pianeta su cui si trova il ristorante. Sebbene non necessario, all'interno del [`Manuale di Cucina.pdf`](./Dataset/knowledge_base/misc/Manuale%20di%20Cucina.pdf) e [`Codice Galattico.pdf`](./Dataset/knowledge_base/codice_galattico/Codice%20Galattico.pdf) vi è una descrizione di come funzionano le licenze.
-- le domande di difficoltà "Hard" riguardano le distanze tra pianeti, i tipi di cottura/preparazione e la licenza necessaria per la preparazione (ogni piatto necessità di certe tecnica e ogni tecnica necessità di certe licenze). Il [`Distanze.csv`](./Dataset/knowledge_base/misc/Distanze.csv) c'è la tabella delle distanze tra pianeti. Il pdf [Manuale di Cucina.pdf](./Dataset/knowledge_base/misc/Manuale%20di%20Cucina.pdf) contiene le ultime due informazioni.
+- le domande di difficoltà "Easy" riguardano solo gli Ingredienti e le Tecniche, pertanto bastano solo i [Menu](./Dataset/knowledge_base/menu/) di ciascun ristorante
+- le domande di difficoltà "Medium" riguardano anche le Licenze e i Pianeti. Nei [Menu](./Dataset/knowledge_base/menu/) sono descritti il livello di Licenza di ogni Chef e il Pianeta su cui si trova il ristorante. Sebbene non necessario, all'interno del [`Manuale di Cucina.pdf`](./Dataset/knowledge_base/misc/Manuale%20di%20Cucina.pdf) e [`Codice Galattico.pdf`](./Dataset/knowledge_base/codice_galattico/Codice%20Galattico.pdf) vi è una descrizione di come funzionano le licenze.
+- le domande di difficoltà "Hard" riguardano le distanze tra pianeti, i tipi di cottura/preparazione e la licenza necessaria per la preparazione (ogni piatto necessita di certe tecniche e ogni tecnica necessita di certe licenze). Nel [`Distanze.csv`](./Dataset/knowledge_base/misc/Distanze.csv) c'è la tabella delle distanze tra pianeti. Il pdf [Manuale di Cucina.pdf](./Dataset/knowledge_base/misc/Manuale%20di%20Cucina.pdf) contiene le ultime due informazioni.
 - le domande di difficoltà "Impossible" riguardano piccoli dettagli che si trovano all'interno di [`Codice Galattico.pdf`](./Dataset/knowledge_base/codice_galattico/Codice%20Galattico.pdf) e [`Blog post`](./Dataset/knowledge_base/blogpost/)
 
 Le domande sono in linguaggio naturale ma hanno come risposta univoca una lista di piatti. Ad esempio, la prima domanda "Quali sono i piatti che includono le Chocobo Wings come ingrediente?", ha come risposta "Galassia di Sapori: Il Viaggio Senza Tempo", mentre la domanda 10 "Quali piatti eterei sono preparati usando sia la Cottura Olografica Quantum Fluttuante che la Decostruzione Interdimensionale Lovecraftiana?" ha come risposta i piatti "Risotto dei Multiversi", "La Mucca Che Stordisce l'Universo" e "Sogni di Abisso Cosmico".
@@ -50,7 +50,7 @@ All'interno troverai i seguenti file e cartelle:
     - L’elenco degli ordini professionali gastronomici a cui uno chef può aderire
     - L’elenco e la descrizione delle tecniche culinarie di preparazione esistenti
     - \[Hint\] La maggior parte del documento descrive nel dettaglio le tecniche disponibili. Ci sono circa 10 macrocategorie di tecniche culinarie dove ciascuna di esse comprende circa 5 tecniche. Alcuni utenti potrebbero richiedere piatti con una specifica macrocategoria di tecnica o una specifica tecnica.
-    - \[Hint\] La maggior parte del testo è flavuor e non serve per rispondere alle domande.
+    - \[Hint\] La maggior parte del testo è flavour e non serve per rispondere alle domande.
     - \[Hint\] Gli ordini professionali sono perlopiù usati da alcuni utenti che esprimono una preferenza verso una specifica tecnica. Questa tecnica in genere è riportata nei menu attraverso l'uso di emoji + glossario.
 
 - [`Menu (30 ristoranti)`](./Dataset/knowledge_base/menu/)
@@ -60,7 +60,7 @@ All'interno troverai i seguenti file e cartelle:
     - Ogni menu contiene 10 piatti
     - Ogni piatto contiene gli ingredienti usati e le tecniche di preparazione
     - Alcuni menu possiedono anche una descrizione in linguaggio naturale della preparazione
-    - Laddove via siano certi ordini professionali, i menu lo citano
+    - Laddove vi siano certi ordini professionali, i menu lo citano
 
 - [`Distanze.csv`](./Dataset/knowledge_base/misc/Distanze.csv)
     Un csv che contiene la matrice delle distanze in anni luce tra i pianeti su cui si trovano i diversi ristoranti.    
