@@ -18,7 +18,6 @@ Questi sono i nomi dei pianeti:
 - Arrakis
 - Namecc
 - Klyntar
-- Montressor
 
 Rispondi in formato json.
 Alcuni testi di menu sono gia strutturati in sezioni.
