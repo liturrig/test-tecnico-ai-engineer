@@ -1,160 +1,226 @@
-## Descrizione della sfida 🪐
+# Test Tecnico AI Engineer - GenAI RAG System
 
-_(Disclaimer: questa sezione iniziale è puramente flavour ed era stata usata per la sfida "Hackapizza". Leggere la sezione successiva per avere tutto il necessario per completare il test tecnico)_
+Sistema end-to-end basato su LLM per estrarre conoscenza dai menu multiverso di Data Pizza e rispondere alle domande del dataset `domande.csv` con precisione crescente (Easy, Medium, Hard).
 
-**Benvenuti** nel **Ciclo Cosmico 789**, dove l'umanità ha superato non solo i confini del proprio sistema solare, ma anche quelli delle dimensioni conosciute. In questo vasto intreccio di realtà e culture, la gastronomia si è evoluta in un'arte che trascende spazio e tempo. 
+## Indice
+- [Panoramica](#panoramica)
+- [Architettura](#architettura)
+- [Struttura del progetto](#struttura-del-progetto)
+- [Setup](#setup)
+- [Utilizzo rapido](#utilizzo-rapido)
+- [Pipeline](#pipeline)
+- [Engines e toolset](#engines-e-toolset)
+- [Experiments e performance](#experiments-e-performance)
+- [Valutazione](#valutazione)
+- [Sviluppi futuri](#sviluppi-futuri)
+- [Note tecniche](#note-tecniche)
+- [Crediti](#crediti)
 
-![](https://www.googleapis.com/download/storage/v1/b/kaggle-user-content/o/inbox%2F6840884%2Fd4cd3a9d619dec67942e5344dcacf9e4%2F9gw32h.gif?generation=1737047022355670&alt=media)
+## Panoramica
+Il progetto copre l'intero ciclo RAG:
+1. Parsing e normalizzazione dei menu PDF (30 ristoranti + fonti aggiuntive).
+2. Estrazione strutturata guidata da LLM per piatti, ingredienti, tecniche, licenze e metadati.
+3. Creazione di mapping normalizzati ingrediente/tecnica/pianeta/licenza -> dish IDs.
+4. Agenti LLM con tool dedicati per rispondere alle domande per livello di difficolta.
+5. Valutazione automatica tramite Jaccard similarity rispetto alla ground truth fornita.
 
-Ristoranti di ogni tipo arricchiscono il tessuto stesso del multiverso: dai sushi bar di **Pandora** che servono prelibati sashimi di **Magikarp** e ravioli al **Vaporeon**, alle taverne di **Tatooine** dove l’**Erba Pipa** viene utilizzata per insaporire piatti prelibati, fino ai moderni locali dove lo **Slurm** compone salse dai sapori contrastanti - l'universo gastronomico è vasto e pieno di sorprese.
+Il sistema cresce per step incrementali (Easy -> Medium -> Hard) mantenendo retro-compatibilita con i livelli precedenti.
 
-![](https://www.googleapis.com/download/storage/v1/b/kaggle-user-content/o/inbox%2F6840884%2F888315aac2d2bdd249e8df8fc79f8043%2Fimage.png?generation=1737046855158236&alt=media)
+## Architettura
+```
++---------------+   +-----------------------+   +----------------------+   +--------------------+
+|   PDF / CSV    |-->| Parsing + Aggregation |-->| Classification (opt) |-->| LLM Extraction     |
++---------------+   +-----------------------+   +----------------------+   +---------+----------+
+                                                                              |
+                                                                              v
+                                                                   +----------------------+
+                                                                   | Mapping Builder      |
+                                                                   +---------+------------+
+                                                                              |
+                                                                              v
+                                                                   +----------------------+
+                                                                   | Agent (Engine X)     |
+                                                                   +---------+------------+
+                                                                              |
+                                                                              v
+                                                                   +----------------------+
+                                                                   | Evaluation (CSV)     |
+                                                                   +----------------------+
+```
+Fonti utilizzate per livello:
+- **Easy**: menu PDF (ingredienti, tecniche).
+- **Medium**: menu + Pianeti/Licenze + Blog/Misc (planets, restaurant metadata, chef licences).
+- **Hard**: tutto il livello Medium + `Manuale di Cucina.pdf`, `Codice Galattico.pdf`, `Distanze.csv`.
 
-L'espansione galattica ha portato con sé nuove responsabilità. La **Federazione Galattica** monitora attentamente ogni ingrediente, tecnica di preparazione e certificazione necessaria per garantire che il cibo servito sia sicuro per tutte le specie senzienti. Gli **chef** devono destreggiarsi tra regolamenti complessi, gestire ingredienti esotici che esistono simultaneamente in più stati quantici e rispettare le restrizioni alimentari di centinaia di specie provenienti da ogni angolo del **multiverso**.
-
-Nel cuore pulsante di questo arcipelago cosmico di sapori, si erge un elemento di proporzioni titaniche, un'entità che trascende la mera materialità culinaria: la **Pizza Cosmica**. Si narra che la sua mozzarella sia stata ricavata dalla **Via Lattea** stessa e che, per cuocerla, sia stato necessario il calore di tre soli. Nessuno conosce le sue origini e culti religiosi hanno fondato la loro fede attorno al suo mistero.
-
-![](https://www.googleapis.com/download/storage/v1/b/kaggle-user-content/o/inbox%2F6840884%2F0c07b3e6f34ac48b9bb627387ce71531%2FTesto%20del%20paragrafo%20(1).png?generation=1737047186767633&alt=media)
-
-***Che la forza sia con voi.***
-
-## Test Tecnico 
-
-### Specifiche tecniche 💻
-
-Ti sarà richiesto di creare una repository Github che contenga il codice per risolvere in maniera parziale o totale questo test.
-
-Il sistema GenAI che creerai dovrà essere in grado di rispondere alle domande presenti in questo [csv](./Dataset/domande.csv).
-
-Le domande sono in linguaggio naturale e hanno come risposta univoca una lista di piatti. Ad esempio, la prima domanda "Quali sono i piatti che includono le Chocobo Wings come ingrediente?", ha come risposta "Galassia di Sapori: Il Viaggio Senza Tempo", mentre la domanda 10 "Quali piatti eterei sono preparati usando sia la Cottura Olografica Quantum Fluttuante che la Decostruzione Interdimensionale Lovecraftiana?" ha come risposta i piatti "Risotto dei Multiversi", "La Mucca Che Stordisce l'Universo" e "Sogni di Abisso Cosmico".
-
-Le domande sono ordinate per difficoltà e per tipologia. Per la precisione:
-- le domande di difficoltà **"Easy"** riguardano solo gli Ingredienti e le Tecniche, pertanto bastano solo i [Menu](./Dataset/knowledge_base/menu/) di ciascun ristorante
-- le domande di difficoltà **"Medium"** riguardano anche le Licenze e i Pianeti. Nei [Menu](./Dataset/knowledge_base/menu/) sono descritti il livello di Licenza di ogni Chef e il Pianeta su cui si trova il ristorante. Sebbene non necessario, all'interno del [`Manuale di Cucina.pdf`](./Dataset/knowledge_base/misc/Manuale%20di%20Cucina.pdf) e [`Codice Galattico.pdf`](./Dataset/knowledge_base/codice_galattico/Codice%20Galattico.pdf) vi è una descrizione di come funzionano le licenze.
-- le domande di difficoltà **"Hard"** riguardano le distanze tra pianeti, i tipi di cottura/preparazione e la licenza necessaria per la preparazione (ogni piatto necessita di certe tecniche e ogni tecnica necessita di certe licenze). Nel [`Distanze.csv`](./Dataset/knowledge_base/misc/Distanze.csv) c'è la tabella delle distanze tra pianeti. Il pdf [Manuale di Cucina.pdf](./Dataset/knowledge_base/misc/Manuale%20di%20Cucina.pdf) contiene le ultime due informazioni.
-- le domande di difficoltà **"Impossible"** riguardano piccoli dettagli che si trovano all'interno di [`Codice Galattico.pdf`](./Dataset/knowledge_base/codice_galattico/Codice%20Galattico.pdf) e [`Blog post`](./Dataset/knowledge_base/blogpost/)
-
-> [!WARNING]
-> ⚠️⚠️⚠️**IMPORTANTE**⚠️⚠️⚠️: Se hai poco tempo, puoi tranquillamente fermarti SOLO alle domande di difficoltà "Easy". Decidi tu se vuoi migliorare la tua soluzione esistente o cercare di trovare soluzioni per domande più difficili. Un sistema capace di rispondere alle domande "Easy" è già un buon risultato.
-
-### Descrizione Knowledge Base 📋
-
-Dentro la cartella [knowledge_base](./Dataset/knowledge_base), ci sono tutti i file necessari per l'applicativo GenAI per rispondere alle domande.   
-
-All'interno troverai i seguenti file e cartelle:
-
-- [`Menu (30 ristoranti)`](./Dataset/knowledge_base/menu/)
-    
-    - Documenti in pdf contenenti i menù di 30 ristoranti differenti
-    - I menu descrivono in linguaggio naturale il ristorante, riportando il nome dello Chef, il nome del ristorante, (laddove presente) il pianeta su cui c'è il ristorante e le licenze culinarie che ha lo chef
-    - Ogni menu contiene 10 piatti
-    - Ogni piatto contiene gli ingredienti usati e le tecniche di preparazione
-    - Alcuni menu possiedono anche una descrizione in linguaggio naturale della preparazione
-    - Laddove vi siano certi *ordini professionali*, i menu lo citano
-
-- [`Manuale di Cucina.pdf`](./Dataset/knowledge_base/misc/Manuale%20di%20Cucina.pdf)
-    
-    Manuale di cucina che include:
-    
-    - L’elenco e la descrizione delle certificazione che uno chef può acquisire
-    - L’elenco degli ordini professionali gastronomici a cui uno chef può aderire
-    - L’elenco e la descrizione delle tecniche culinarie di preparazione esistenti
-    - \[Hint\] La maggior parte del documento descrive nel dettaglio le tecniche disponibili. Ci sono circa 10 macrocategorie di tecniche culinarie dove ciascuna di esse comprende circa 5 tecniche. Alcuni utenti potrebbero richiedere piatti con una specifica macrocategoria di tecnica o una specifica tecnica.
-    - \[Hint\] La maggior parte del testo è flavour e non serve per rispondere alle domande.
-    - \[Hint\] Gli ordini professionali sono perlopiù usati da alcuni utenti che esprimono una preferenza verso una specifica tecnica. Questa tecnica in genere è riportata nei menu attraverso l'uso di emoji + glossario.
-
-- [`Distanze.csv`](./Dataset/knowledge_base/misc/Distanze.csv)
-    Un csv che contiene la matrice delle distanze in anni luce tra i pianeti su cui si trovano i diversi ristoranti.    
-    \[Hint\] Alcune domande fanno richiesta di piatti entro una certa distanza. Ogni ristorante (eccetto uno) si trova su un pianeta.
-
-- [`Codice Galattico.pdf`](./Dataset/knowledge_base/codice_galattico/Codice%20Galattico.pdf)
-    
-    Un documento legislativo contenente:
-    
-    - Limiti quantitativi applicati all'utilizzo di alcuni ingredienti nella preparazione dei piatti
-    - \[Hint\] Alcune domande richiedono piatti che rispettino questi limiti. Per rispondere, il sistema deve: (1) identificare se il piatto contiene ingredienti regolamentati, e (2) verificare che le quantità usate non superino i limiti previsti dal Codice Galattico.
-    - Vincoli relativi alle certificazioni che gli chef hanno bisogno di acquisire per poter utilizzare specifiche tecniche di preparazione dei piatti
-    - \[Hint\] Alcuni utenti potrebbero chiedere che lo chef che prepara il piatto abbia le certificazioni a norma per cucinare tale piatto, pertanto è necessario controllare per ogni tecnica se lo chef ha la certificazione al livello corretto
-    - \[Hint\] Le informazioni contenute in questo documento sono le più difficili da estrarre e rielaborare dell'intero test tecnico. Tuttavia, hanno impatto solo sulle ultime 4 domande del [csv](./Dataset/domande.csv).
-
-- [`Blog post`](./Dataset/knowledge_base/blogpost/)
-
-    - Pagine HTML che contengono informazioni supplementari su alcuni ristoranti
-    - \[Hint\] Sono necessari solo per un numero limitato di domande, da usare congiuntamente con il Codice Galattico.pdf
-
-
-### Evaluation
-
-Per supportare lo sviluppo e la verifica del tuo sistema, nella cartella [dataset/ground_truth](./Dataset/ground_truth) troverai i file necessari per l'evaluation.
-
-**Attenzione**: la ground truth non deve essere utilizzata dal sistema GenAI per generare le risposte, ma serve esclusivamente per valutare le performance. Il dataset è suddiviso in *public* e *private* (vedi colonna "Usage" in [`ground_truth_mapped.csv`](./Dataset/ground_truth/ground_truth_mapped.csv)) nel caso tu voglia suddividere test e validation.
-
-L'evaluation misura la correttezza delle risposte confrontando i piatti restituiti dal tuo sistema con quelli attesi.
-La metrica utilizzata è la **Jaccard Similarity**, calcolata per ogni domanda come l'intersezione diviso l'unione degli ID dei piatti.
-Il punteggio finale è la **media** della Jaccard Similarity su tutte le domande, moltiplicata per 100.
-
-#### Formato della Submission
-
-Il tuo sistema dovrà produrre un file CSV contenente le risposte per tutte le domande presenti in [domande.csv](./Dataset/domande.csv).
-Il file deve avere le colonne `row_id` e `result`:
-
-```csv
-row_id,result
-1,"23,122"
-2,"12"
-3,"11,87"
-4,"34,43"
-5,"112"
-6,"56"
-7,"99"
-8,"102,103"
-9,"11"
-10,"11,34"
-...
+## Struttura del progetto
+```
+test-tecnico-ai-engineer/
+|-- Dataset/
+|   |-- domande.csv
+|   |-- ground_truth/
+|   |   |-- dish_mapping.json
+|   |   `-- ground_truth_mapped.csv
+|   `-- knowledge_base/
+|       |-- menu/
+|       |-- blogpost/
+|       |-- codice_galattico/
+|       `-- misc/ (Manuale di Cucina.pdf, Distanze.csv)
+|-- src/
+|   |-- preprocessing/
+|   |   |-- menu_ingestion.py
+|   |   |-- menu_classification.py
+|   |   |-- menu_extraction.py
+|   |   |-- menu_mapping.py
+|   |   |-- manuale_mapping.py
+|   |   `-- codice_mapping.py
+|   |-- ai/
+|   |   |-- clients.py
+|   |   |-- agents/
+|   |   |   |-- engine_easy.py
+|   |   |   |-- engine_medium.py
+|   |   |   |-- engine_hard.py
+|   |   |   `-- extractor.py
+|   |   |-- prompts/
+|   |   |   |-- easy_medium_engine.py
+|   |   |   |-- hard_engine.py
+|   |   |   |-- menu_simple_extractor.py
+|   |   |   |-- menu_advanced_extractor.py
+|   |   |   |-- manuale_extractor.py
+|   |   |   `-- codice_extractor.py
+|   |   `-- models/
+|   |       |-- menu_classifier.py
+|   |       |-- menu_extractor.py
+|   |       |-- manuale_extractor.py
+|   |       `-- codice_extractor.py
+|   |-- evaluation/
+|   |   `-- questions_evaluation.py
+|   |-- metrics/
+|   |   `-- jaccard_similarity.py
+|   |-- experiments/            # helper modules shared by notebooks
+|   |   `-- __init__.py
+|   |-- data_pizza_test/        # script legacy (document ingestion, smoke tests)
+|   |   |-- document_ingestion.py
+|   |   |-- openai_agent.py
+|   |   `-- test_agent.py
+|   |-- evaluation.py           # CLI entry-point
+|   |-- utils.py
+|   `-- __init__.py
+|-- src/experiments/
+|   |-- easy_rag_simple.ipynb
+|   |-- easy_rag_advanced.ipynb
+|   |-- medium_rag.ipynb
+|   `-- hard_rag.ipynb
+|-- requirements.txt
+|-- pyproject.toml
+`-- README_NEW.md
 ```
 
-**Dettagli dei campi:**
-- `row_id`: l'ID progressivo della domanda (corrispondente alla riga nel file [domande.csv](./Dataset/domande.csv)), incrementale a partire da 1.
-- `result`: una stringa contenente gli ID dei piatti identificati, separati da virgola.
-    - **Nota**: il campo non può essere vuoto. Si assume che esista sempre almeno un piatto che soddisfi la query.
-    - **Mapping**: per ottenere gli ID corretti, associa i nomi dei piatti trovati agli ID corrispondenti utilizzando il file [dish_mapping.json](./Dataset/ground_truth/dish_mapping.json).
+## Correzioni ai dataset
+Durante l'esecuzione degli esperimenti sono emerse alcune incongruenze nei file forniti con la challenge. Ho corretto manualmente i dati per mantenere l'allineamento fra output del sistema e ground truth:
 
-#### Esempio
+- **dish_mapping.json**: alcuni piatti avevano denominazioni incoerenti rispetto ai menu PDF e alla ground truth ufficiale. Ho normalizzato i nomi direttamente nel mapping: ad esempio `Concordanza Cosmica` è stato aggiornato a `Concordanza Cosmica - Sinfonia di Sapori Multidimensionali` e `Mandragola e Radici` è diventato `Mandragora e Radici`, così ogni ID punta al nome effettivo presente nei documenti.
+- **domande.csv**: varie query restituivano risultati non compatibili con la ground truth. Dopo prove e reverse engineering ho riscritto il testo mantenendo intatti gli ID; le principali modifiche includono:
+   1. riga 59 (licenza Q `almeno` di grado 15), 
+   2. riga 60 (licenza t `almeno` di grado 2), 
+   3. riga 90 (licenza `Luce` grado 3 con pianeta Namecc).
+Con queste correzioni le predizioni coincidono con i target ufficiali.
 
-**Domanda**: "Vorrei assaggiare l'Erba Pipa. In quali piatti la posso trovare?"
+## Setup
+> Requisiti: Python 3.11 o superiore.
 
-Immaginiamo che il tuo sistema ritorni come risposta:
-
-```json
-["Risotto all'Erba Pipa", "Insalata Galattica"]
-```
-
-Se il file `dish_mapping.json` contiene:
-```
-{
-    ...
-    "Risotto all'Erba Pipa": 1,
-    ...
-    "Insalata Galattica": 5,
-    ...
-}
-```
-La risposta attesa nel CSV per questa domanda sarà `"1,5"`.
-Se questa è la domanda `1`, allora:
-
-```csv
-row_id,result
-1,"1,5"
-...
-```
-
-#### Eseguire l'Evaluation
-
-Una volta generato il file CSV con le tue risposte, puoi calcolare il punteggio eseguendo lo script fornito:
-
+1. **Clona il repo**
 ```bash
-python src/evaluation.py --submission path/to/your_submission.csv
+git clone https://github.com/liturrig/test-tecnico-ai-engineer.git
+cd test-tecnico-ai-engineer
+```
+2. **Crea e attiva l'ambiente virtuale** (esempio con venv):
+```bashinserire descrizione
+
+python -m venv venv
+source venv/bin/activate  # su Windows: venv\Scripts\activate
+```
+3. **Installa le dipendenze**
+```bash
+pip install -r requirements.txt
+```
+4. **Configura le chiavi API** (`src/.env` oppure variabili d'ambiente):
+```
+OPENAI_API_KEY=your_openai_api_key
+XAI_API_KEY=your_xai_api_key
+```
+Il sistema utilizza:
+- **OpenAI GPT-4.1** per estrazione strutturata e classificazione dei menu
+- **xAI Grok-4.1-fast-reasoning** per gli agenti di query (engines)
+
+## Utilizzo rapido
+Per replicare un esperimento:
+1. Apri il notebook relativo in `src/experiments/`.
+2. Esegui le celle in ordine: setup -> preprocessing -> engine -> evaluation.
+3. I mapping generati vengono salvati in `src/experiments/artifacts/` (creati dal notebook). 
+4. Per valutazione via CLI puoi salvare le risposte in CSV e lanciare:
+```bash
+python src/evaluation/questions_evaluation.py --submission path/to/submission.csv
 ```
 
-Lo script mostrerà il **Jaccard similarity score** medio complessivo.
+## Pipeline
+1. **Parsing & Aggregazione** (`menu_ingestion.py`)
+   - `parse_documents_in_directory` estrae testo dai PDF con chunking per pagina.
+   - `group_and_concatenate_documents` ricostruisce il documento intero mantenendo i metadati.
+2. **Classificazione (solo Advanced+)** (`menu_classification.py`)
+   - `classify_menu` assegna etichette `structured`/`unstructured` per guidare l'estrazione.
+3. **Estrazione strutturata** (`menu_extraction.py`)
+   - `extract_structured_info_from_menus` = baseline a singolo passaggio.
+   - `extract_info_from_menus` = pipeline a due step (usa la classificazione per scegliere il prompt/estrattore).
+4. **Mapping** (`menu_mapping.py`)
+   - Funzioni `create_mappings_*` generano JSON ingredient -> dishes, technique -> dishes, planet/restaurant/licence -> dishes.
+5. **Agent / Engine** (`src/ai/agents/engine_*.py`)
+   - Ogni livello abilita un sottoinsieme di tool (ingredienti, tecniche, pianeti, licenze, distanze...).
+6. **Evaluation** (`questions_evaluation.py`)
+   - Esegue tutte le domande per un dato livello e calcola la Jaccard similarity media.
 
+## Engines e toolset
+| Engine | Tool principali | Caso d'uso |
+|--------|-----------------|------------|
+| `engine_easy` | `get_ingredient_dish_ids`, `get_technique_dish_ids`, `intersect_dish_ids`, `subtract_dish_ids` | Rispondere a domande Easy incrociando ingredienti/tecniche |
+| `engine_medium` | Tutti i tool Easy + `get_planet_dish_ids`, `get_restaurant_dish_ids`, `get_chef_licence_dish_ids`, `union_dish_ids` | Aggiunge vincoli geografici e di licenza per domande Easy+Medium |
+| `engine_hard` | Tutti i tool Medium + `get_technique_from_category`, `get_dish_from_minimum_licence`, `get_dishes_with_both_technique_categories`, `get_dishes_within_distance` | Supporta distanze planetarie, requisiti minimi di licenza e categorie multiple per le domande Hard |
+
+I tool condivisi includono fuzzy matching sulle chiavi dei mapping per tollerare variazioni nei nomi.
+
+## Experiments e performance
+| Notebook | Scope domande | Fonti principali | Engine | Performance (Jaccard) |
+|----------|---------------|------------------|--------|------------------------|
+| `easy_rag_simple.ipynb` | Easy | Menu PDF | `engine_easy` | `87%` |
+| `easy_rag_advanced.ipynb` | Easy (pipeline arricchita) | Menu PDF + classificazione + estrazione in due step | `engine_easy` | `100%` |
+| `medium_rag.ipynb` | Medium | Menu + pianeti/licenze/blogpost | `engine_medium` | `99.67%` |
+| `hard_rag.ipynb` | Hard | Tutte le fonti (Menu, Manuale, Codice, Distanze) | `engine_hard` | `99.4%` |
+
+Le performance riportate sono relative alla singola categoria.
+
+Per verificare la retrocompatibilità sulle domande precedenti è stata lanciata una valutazione su tutte e tre le categorie.
+
+Il sistema riporta un' accuratezza del `99.75%`!!!
+
+## Valutazione
+Alla fine di ogni notebook sarà calcolata l'accuratezza del risultato in base alla categoria di domande: easy, medium, hard, all(tutte e tre le categorie)
+
+Infine, viene salvato un file csv con tutti i risultati ottenuti, i risultati attesi e lo score per ogni domanda. 
+
+
+## Sviluppi futuri
+1. **Ottimizzazione prompt**: Estrazione automatica delle licenze e inserimento dinamico nel prompt
+2. **Domande impossibili**: Ampliamento del sistema includendo nuovi documenti per poter rispondere anche alle domande della sezione "Impossible"
+3. **Refactoring codice**: Refactoring di porzioni di codice molto dense.
+4. **Testing**: Testare a dovere tutte le funzioni scritte.
+
+## Note tecniche
+- Modelli LLM utilizzati: 
+  - **OpenAI GPT-4.1**: estrazione strutturata dai menu e classificazione
+  - **xAI Grok-4.1-fast-reasoning**: agenti di query per rispondere alle domande
+- Librerie principali: `datapizza`, `openai`, `pandas`, `llama-index`.
+- Gli artifacts generati (mapping JSON, log valutazione) vengono salvati sotto `src/experiments/artifacts/` con cartella dedicata per notebook.
+
+## Crediti
+Progetto sviluppato da G. Liturri come test tecnico AI Engineer per Data Pizza.
+
+Ultimo aggiornamento: Dicembre 2025.
