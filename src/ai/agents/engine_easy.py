@@ -5,16 +5,18 @@ from pathlib import Path
 from datapizza.agents import Agent
 from datapizza.clients.openai import OpenAIClient
 from datapizza.tools import tool
+from tenacity import retry, stop_after_attempt
 
 from src.evaluation import MAPPINGS_DIR
-from src.ai.clients import get_client
-from src.ai.prompts.engine import SYSTEM_PROMPT
+from src.ai.clients import get_grok_client
+from src.ai.prompts.easy_medium_engine import SYSTEM_PROMPT
 
 
 
 
 def _load_mapping(filename: str) -> dict:
     with open(MAPPINGS_DIR / filename, "r", encoding="utf-8") as mapping_file:
+
         return json.load(mapping_file)
 
 
@@ -120,14 +122,25 @@ def extract_dish_ids_from_response(response: str) -> set[int]:
             f"Impossibile interpretare la lista estratta come JSON: {raw_list}"
         ) from exc
 
-    return set(dish_ids)
+    if not isinstance(dish_ids, list):
+        raise ValueError(f"La risposta dell'agente non contiene una lista valida: {raw_list}")
 
-def get_agent(system_prompt: str = SYSTEM_PROMPT, model_name: str = "gpt-4.1")-> Agent:
+    normalized_ids: list[int] = []
+    for item in dish_ids:
+        if isinstance(item, int):
+            normalized_ids.append(item)
+            
+        elif isinstance(item, str):
+            normalized_ids.append(int(item.strip()))
+
+    return set(normalized_ids)
+
+def get_agent(system_prompt: str = SYSTEM_PROMPT, model_name: str = "grok-4-1-fast-reasoning")-> Agent:
     """Crea e restituisce l'agente configurato."""
 
     agent = Agent(
         name="assistant",
-        client=get_client(model_name=model_name),
+        client=get_grok_client(model_name=model_name),
         system_prompt=system_prompt,
         tools=[
             get_ingredient_dish_ids,
@@ -138,6 +151,7 @@ def get_agent(system_prompt: str = SYSTEM_PROMPT, model_name: str = "gpt-4.1")->
     )
     return agent
 
+@retry(stop=stop_after_attempt(3))
 def query_dish_ids(question: str, agent: Agent) -> set[int]:
     """Esegue la domanda con l'agente e restituisce il set di identificativi."""
 

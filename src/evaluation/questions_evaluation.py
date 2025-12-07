@@ -2,10 +2,11 @@ import csv
 import sys
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
+from typing_extensions import Literal
 from datapizza.agents import Agent
 import pandas as pd
 
-from src.ai.agents.engine import query_dish_ids
+from src.ai.agents.engine_hard import query_dish_ids
 
 
 
@@ -82,7 +83,7 @@ def jaccard_score(set1: Set[int], set2: Set[int]) -> float:
     union = len(set1 | set2)
     return intersection / union if union != 0 else 0.0
 
-def evaluate_easy_questions(agent: Agent, question_path: Path, ground_truth_path: Path) -> pd.DataFrame:
+def evaluate_questions(agent: Agent, question_path: Path, ground_truth_path: Path, level: Literal["easy", "medium", "hard", "all"]) -> pd.DataFrame:
     """
     Evaluate the agent on easy questions and return a DataFrame with predictions.
 
@@ -98,21 +99,28 @@ def evaluate_easy_questions(agent: Agent, question_path: Path, ground_truth_path
     domande = _load_domande(question_path)
     ground_truth = _load_ground_truth(ground_truth_path)
 
-    easy_questions = [
-        (idx, question) for idx, question, difficulty in domande if difficulty.lower() == "easy"
-    ]
+    if level.lower() == "all":
+        questions = [(idx, question) for idx, question, difficulty in domande if difficulty.lower() != "impossible"]
+    else:
+        questions = [
+            (idx, question) for idx, question, difficulty in domande if difficulty.lower() == level.lower()
+        ]
 
-    total = len(easy_questions)
+    total = len(questions)
     predictions = []
     scores = 0.0
-    for idx, question in easy_questions:
+    for idx, question in questions:
 
         expected = ground_truth.get(idx)
-        predicted = query_dish_ids(agent=agent, question=question)
-        score = jaccard_score(expected, predicted)
-        scores += score
-        predictions.append([idx, expected, predicted, score])
+        try: 
+            predicted = query_dish_ids(agent=agent, question=question)
+            score = jaccard_score(expected, predicted)
+            scores += score
+            predictions.append([idx, expected, predicted, score])
 
+        except Exception as e:
+            print(f"Error processing question {idx}: {e}")
+            predictions.append([idx, expected, set(), 0.0])
         print(f"  atteso:    {sorted(expected)}")
         print(f"  predetto:  {sorted(predicted)}")
         print(f"[{idx:03d}] {score:.2f} - {question}")
@@ -122,6 +130,6 @@ def evaluate_easy_questions(agent: Agent, question_path: Path, ground_truth_path
     print(f"\nAccuratezza Easy: ({accuracy:.2f}%)")
 
     predictions_df = pd.DataFrame(
-        predictions, columns=["row_id", "expected", "predicted", "score"], index=False
+        predictions, columns=["row_id", "expected", "predicted", "score"]
     )
     return predictions_df

@@ -1,14 +1,17 @@
 from pydantic import BaseModel
-from src.ai.clients import get_client
-from src.ai.models.extractor import Restaurant
-from src.ai.prompts.simple_extractor import EXTRACTOR_INPUT_PROMPT, EXTRACTOR_SYSTEM_PROMPT
+from tenacity import retry, stop_after_attempt
+from src.ai.clients import get_openai_client
+from src.ai.models.menu_extractor import Restaurant
+from src.ai.prompts.menu_simple_extractor import EXTRACTOR_INPUT_PROMPT, EXTRACTOR_SYSTEM_PROMPT
+from datapizza.core.clients.models import ClientResponse
 
 
+@retry(stop=stop_after_attempt(3))
 def extraction_call(text: str, 
-                    model_name: str = "gpt-4.1-mini",
+                    model_name: str = "gpt-4.1",
                     system_prompt: str = EXTRACTOR_SYSTEM_PROMPT,
                     input_prompt: str = EXTRACTOR_INPUT_PROMPT, 
-                    output_cls: BaseModel = Restaurant):
+                    output_cls: BaseModel = Restaurant) -> ClientResponse:
     """Make a structured response call to the OpenAI client.
 
     Args:
@@ -21,7 +24,7 @@ def extraction_call(text: str,
         The structured response from the OpenAI client.
     """
 
-    client = get_client(model_name=model_name)
+    client = get_openai_client(model_name=model_name)
 
     result = client.structured_response(
         system_prompt=system_prompt,

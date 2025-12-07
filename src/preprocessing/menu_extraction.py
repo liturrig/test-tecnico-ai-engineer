@@ -1,15 +1,15 @@
 
 from src.ai.agents.extractor import extraction_call
-from src.ai.prompts.advanced_extractor import EXTRACTOR_SYSTEM_PROMPT
+from src.ai.prompts.menu_advanced_extractor import EXTRACTOR_SYSTEM_PROMPT
 
 
-def extract_structured_info_from_menus(documents: dict, model_name: str = "gpt-4.1") -> dict:
+def extract_structured_info_from_menus(documents: dict, model_name: str = "gpt-4.1") -> list:
     """
     Extract information from a set of menu documents.
 
     Args:
         documents (dict): A dictionary where keys are document identifiers and values are menu texts.
-        model_name (str, optional): The name of the model to use for extraction. Defaults to "gpt-4.1".
+        model_name (str, optional): The name of the model to use for extraction. Defaults to "grok-4-1-fast-reasoning".
 
     Returns:
         dict: A dictionary containing extracted information from the menus.
@@ -22,6 +22,7 @@ def extract_structured_info_from_menus(documents: dict, model_name: str = "gpt-4
         restaurants.append(result.structured_data[0].model_dump())
     
     return restaurants
+
 
 def extract_unstructured_info_from_menus(documents: dict, ingredients: list[str], techniques: list[str], model_name: str = "gpt-4.1") -> dict:
     """
@@ -102,7 +103,7 @@ def extract_info_from_menus(documents: dict, classifications: dict, model_name: 
     Args:
         documents (dict): A dictionary where keys are document identifiers and values are menu texts.
         classifications (dict): A dictionary where keys are document identifiers and values are their classifications ("structured" or "unstructured").
-        model_name (str, optional): The name of the model to use for extraction. Defaults to "gpt-4.1".
+        model_name (str, optional): The name of the model to use for extraction. Defaults to "grok-4-1-fast-reasoning".
 
     Returns:
         dict: A dictionary containing extracted information from the menus.
@@ -129,5 +130,6 @@ def extract_info_from_menus(documents: dict, classifications: dict, model_name: 
         extracted_info.extend(extracted_unstructured_info)
 
     return extracted_info   
+
 
     

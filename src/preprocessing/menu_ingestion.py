@@ -1,10 +1,11 @@
 from collections import defaultdict
 from pathlib import Path
+from typing import Optional
 from llama_index.core import SimpleDirectoryReader
 
 
 
-def parse_documents_in_directory(document_path: Path) -> list:
+def parse_documents_in_directory(document_path: Optional[Path] = None, file_path: Optional[Path] = None) -> list:
     """
     Parse documents in the given directory and save the concatenated output as a JSON file.
 
@@ -13,7 +14,10 @@ def parse_documents_in_directory(document_path: Path) -> list:
     Returns:
         list: List of parsed document objects. Each element is a page of a specific document.
     """
-    reader = SimpleDirectoryReader(input_dir=document_path)
+    if file_path:
+        reader = SimpleDirectoryReader(input_files=file_path)
+    else:
+        reader = SimpleDirectoryReader(input_dir=document_path)
     documents = reader.load_data()
     
     return documents
