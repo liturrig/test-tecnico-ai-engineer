@@ -148,19 +148,13 @@ pip install -r requirements.txt
 OPENAI_API_KEY=your_openai_api_key
 XAI_API_KEY=your_xai_api_key
 ```
-Il sistema utilizza:
-- **OpenAI GPT-4.1** per estrazione strutturata e classificazione dei menu
-- **xAI Grok-4.1-fast-reasoning** per gli agenti di query (engines)
 
 ## Utilizzo rapido
 Per replicare un esperimento:
-1. Apri il notebook relativo in `src/experiments/`.
+1. Apri il notebook `hard_rag.ipynb` in `src/experiments/`.
 2. Esegui le celle in ordine: setup -> preprocessing -> engine -> evaluation.
 3. I mapping generati vengono salvati in `src/experiments/artifacts/` (creati dal notebook). 
-4. Per valutazione via CLI puoi salvare le risposte in CSV e lanciare:
-```bash
-python src/evaluation/questions_evaluation.py --submission path/to/submission.csv
-```
+4. L'ultima cella mostrarà l'accuratezza ottenuta.
 
 ## Pipeline
 1. **Parsing & Aggregazione** (`menu_ingestion.py`)
@@ -202,7 +196,7 @@ Per verificare la retrocompatibilità sulle domande precedenti è stata lanciata
 Il sistema riporta un' accuratezza del `99.75%`!!!
 
 ## Valutazione
-Alla fine di ogni notebook sarà calcolata l'accuratezza del risultato in base alla categoria di domande: easy, medium, hard, all(tutte e tre le categorie)
+Alla fine di ogni notebook sarà calcolata l'accuratezza del risultato in base alla categoria di domande: `easy`, `medium`, `hard`, `all`(tutte e tre le categorie).
 
 Infine, viene salvato un file csv con tutti i risultati ottenuti, i risultati attesi e lo score per ogni domanda. 
 
@@ -210,7 +204,7 @@ Infine, viene salvato un file csv con tutti i risultati ottenuti, i risultati at
 ## Sviluppi futuri
 1. **Ottimizzazione prompt**: Estrazione automatica delle licenze e inserimento dinamico nel prompt
 2. **Domande impossibili**: Ampliamento del sistema includendo nuovi documenti per poter rispondere anche alle domande della sezione "Impossible"
-3. **Refactoring codice**: Refactoring di porzioni di codice molto dense.
+3. **Refactoring codice**: Refactoring di porzioni di codice molto dense e docstring complete.
 4. **Testing**: Testare a dovere tutte le funzioni scritte.
 
 ## Note tecniche
