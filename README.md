@@ -152,10 +152,11 @@ XAI_API_KEY=your_xai_api_key
 
 ## Utilizzo rapido
 Per replicare un esperimento:
-1. Apri il notebook `hard_rag.ipynb` in `src/experiments/`.
-2. Esegui le celle in ordine: setup -> preprocessing -> engine -> evaluation.
-3. I mapping generati vengono salvati in `src/experiments/artifacts/` (creati dal notebook). 
-4. L'ultima cella mostrarà l'accuratezza ottenuta.
+1. Apri il notebook `hard_rag.ipynb` in `src/experiments/` 
+2. In alto a destra è presente una voce `Select kernel`. Configura il tuo venv come kernel del notebook.
+3. Esegui tutte le celle in ordine: setup -> preprocessing -> engine -> evaluation.
+4. I mapping generati vengono salvati in `src/experiments/artifacts/` (creati dal notebook). 
+5. L'ultima cella mostrarà l'accuratezza ottenuta e verrà salvato un csv con i risultati.
 
 ## Pipeline
 1. **Parsing & Aggregazione** (`menu_ingestion.py`)
