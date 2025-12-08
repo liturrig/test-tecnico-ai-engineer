@@ -143,7 +143,8 @@ source venv/bin/activate  # su Windows: venv\Scripts\activate
 ```bash
 pip install -r requirements.txt
 ```
-4. **Configura le chiavi API** (`src/.env` oppure variabili d'ambiente):
+4. **Configura le chiavi API** (crea un file `src/.env` oppure variabili d'ambiente):
+
 ```
 OPENAI_API_KEY=your_openai_api_key
 XAI_API_KEY=your_xai_api_key
